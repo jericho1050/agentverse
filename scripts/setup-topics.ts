@@ -1,7 +1,7 @@
 import { Client, TopicCreateTransaction, PrivateKey } from '@hashgraph/sdk';
 import * as dotenv from 'dotenv';
 
-dotenv.config({ path: '.env.local' });
+dotenv.config();
 
 interface TopicConfig {
   memo: string;

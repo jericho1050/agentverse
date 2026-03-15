@@ -9,7 +9,7 @@ import {
 } from '@hashgraph/sdk';
 import * as dotenv from 'dotenv';
 
-dotenv.config({ path: '.env.local' });
+dotenv.config();
 
 interface AgentAccount {
   name: string;
@@ -40,28 +40,22 @@ async function setupAccounts() {
     client.setOperator(operatorId, operatorPrivateKey);
 
     // Load agent accounts from environment
-    const agentAccounts: AgentAccount[] = [];
-    let agentIndex = 1;
+    const agentDefs = [
+      { name: 'Code Review', idVar: 'AGENT_CODE_REVIEW_ACCOUNT_ID', keyVar: 'AGENT_CODE_REVIEW_PRIVATE_KEY' },
+      { name: 'Data Analysis', idVar: 'AGENT_DATA_ANALYSIS_ACCOUNT_ID', keyVar: 'AGENT_DATA_ANALYSIS_PRIVATE_KEY' },
+      { name: 'Content Writer', idVar: 'AGENT_CONTENT_WRITER_ACCOUNT_ID', keyVar: 'AGENT_CONTENT_WRITER_PRIVATE_KEY' },
+    ];
 
-    while (true) {
-      const accountId = process.env[`AGENT_${agentIndex}_ACCOUNT_ID`];
-      const privateKey = process.env[`AGENT_${agentIndex}_PRIVATE_KEY`];
-
-      if (!accountId || !privateKey) {
-        break;
-      }
-
-      agentAccounts.push({
-        name: `Agent ${agentIndex}`,
-        accountId,
-        privateKey
-      });
-
-      agentIndex++;
-    }
+    const agentAccounts: AgentAccount[] = agentDefs
+      .filter(d => process.env[d.idVar] && process.env[d.keyVar])
+      .map(d => ({
+        name: d.name,
+        accountId: process.env[d.idVar]!,
+        privateKey: process.env[d.keyVar]!,
+      }));
 
     if (agentAccounts.length === 0) {
-      throw new Error('No agent accounts found in environment. Add AGENT_1_ACCOUNT_ID, AGENT_1_PRIVATE_KEY, etc.');
+      throw new Error('No agent accounts found in environment.');
     }
 
     console.log(`Found ${agentAccounts.length} agent account(s) to set up`);

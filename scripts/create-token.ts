@@ -7,7 +7,7 @@ import {
 } from '@hashgraph/sdk';
 import * as dotenv from 'dotenv';
 
-dotenv.config({ path: '.env.local' });
+dotenv.config();
 
 async function createToken() {
   console.log('Creating AgentVerse Token (AVT) on Hedera Testnet...\n');
