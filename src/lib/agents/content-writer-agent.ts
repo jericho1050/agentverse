@@ -1,9 +1,6 @@
-import { bedrock } from '@ai-sdk/amazon-bedrock';
-import { generateText } from 'ai';
-import { BaseAgent, AgentProfile } from './base-agent';
+import { callClaude } from './llm-client';
+import { BaseAgent, AgentProfile, extractJSON } from './base-agent';
 import { CONTENT_WRITING_PROMPT } from './prompts';
-
-const model = bedrock('us.anthropic.claude-sonnet-4-5-20250929-v1:0');
 
 export class ContentWriterAgent extends BaseAgent {
   constructor(profile: AgentProfile) {
@@ -15,11 +12,10 @@ export class ContentWriterAgent extends BaseAgent {
     const tone = (input.tone as string) || 'professional';
     const length = (input.length as string) || 'medium';
 
-    const { text } = await generateText({
-      model,
-      system: CONTENT_WRITING_PROMPT,
-      prompt: `Write content about: ${topic}\nTone: ${tone}\nLength: ${length}`,
-    });
-    return JSON.parse(text);
+    const text = await callClaude(
+      CONTENT_WRITING_PROMPT,
+      `Write content about: ${topic}\nTone: ${tone}\nLength: ${length}`,
+    );
+    return extractJSON(text);
   }
 }

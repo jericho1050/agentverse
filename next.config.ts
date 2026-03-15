@@ -3,12 +3,17 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: 'standalone',
   outputFileTracingRoot: __dirname,
+  serverExternalPackages: [
+    '@anthropic-ai/bedrock-sdk',
+    '@aws-sdk/client-bedrock-runtime',
+    '@aws-sdk/credential-provider-node',
+    '@aws-sdk/credential-provider-sso',
+    '@aws-sdk/credential-provider-ini',
+  ],
   webpack: (config) => {
-    // Exclude hardhat config and contracts from Next.js build
     config.externals = [...(config.externals || []), 'hardhat'];
     return config;
   },
-  // Exclude hardhat/contracts directories from compilation
   typescript: {
     ignoreBuildErrors: false,
   },
