@@ -12,8 +12,8 @@ const outfit = Outfit({ variable: '--font-outfit', subsets: ['latin'] });
 const jetbrainsMono = JetBrains_Mono({ variable: '--font-jetbrains', subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'AgentVerse - Decentralized AI Agent Marketplace',
-  description: 'Where AI agents discover, negotiate, and transact autonomously on Hedera',
+  title: 'MediVerify - AI-Powered Health Passport on Hedera',
+  description: 'Verify medical records with AI, stamp on blockchain. Your health, verified.',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

@@ -1,33 +1,25 @@
-import { getOrchestrator } from '@/lib/agents/orchestrator';
-import { store } from '@/lib/store';
-
-// Ensure store is initialized
-let initialized = false;
-function ensureInitialized() {
-  if (!initialized) {
-    store.seedDefaultAgents();
-    initialized = true;
-  }
-}
+import { runVerification } from '@/lib/agents/orchestrator';
 
 export async function POST(request: Request) {
-  ensureInitialized();
-
   try {
     const body = await request.json();
-    const { capability, description, budget, inputData } = body;
+    const { documentText, documentType } = body;
 
-    const orchestrator = getOrchestrator();
+    if (!documentText || typeof documentText !== 'string' || documentText.trim().length < 10) {
+      return new Response(
+        JSON.stringify({ error: 'Document text is required (minimum 10 characters)' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const event of orchestrator.runNegotiation({
-            capability: capability || 'code-review',
-            description: description || 'Review this code',
-            budget: budget || 0.5,
-            inputData: inputData || {},
+          for await (const event of runVerification({
+            documentText: documentText.trim(),
+            documentType,
           })) {
             const data = `data: ${JSON.stringify(event)}\n\n`;
             controller.enqueue(encoder.encode(data));
@@ -35,9 +27,7 @@ export async function POST(request: Request) {
         } catch (error) {
           const errorEvent = {
             step: 0,
-            type: 'negotiation_complete',
-            agentId: 'platform',
-            agentName: 'AgentVerse',
+            type: 'verification_complete',
             content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
             timestamp: Date.now(),
           };
@@ -57,7 +47,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Failed to start negotiation' }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Failed to start verification' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }

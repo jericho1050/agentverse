@@ -1,4 +1,4 @@
-// Template Chat Types (used by hedera-agent-kit template components)
+// ============= Template Types (keep for hedera-agent-kit compatibility) =============
 export type AgentMode = 'autonomous' | 'human';
 
 export interface Message {
@@ -29,162 +29,63 @@ export interface AgentResponse {
   result: string;
 }
 
-// HCS Message Base Types
-export interface HCSMessageBase {
-  version: '1.0';
-  timestamp: number;
-}
+// ============= MediVerify Types =============
 
-// HCS Message Types - All messages sent to Hedera Consensus Service
-
-export interface AgentRegistration extends HCSMessageBase {
-  type: 'AGENT_REGISTER';
-  agentId: string;
-  name: string;
-  capabilities: string[];
-  description: string;
-  pricing: {
-    currency: 'HBAR';
-    basePrice: number;
-    unit: 'per-task';
-  };
-  accountId: string;
-  evmAddress: string;
-}
-
-export interface ServiceRequest extends HCSMessageBase {
-  type: 'SERVICE_REQUEST';
-  requestId: string;
-  requesterId: string;
-  requiredCapabilities: string[];
-  description: string;
-  budget: number; // in HBAR
-  inputData: Record<string, unknown>;
-  deadline: number; // timestamp
-}
-
-export interface ServiceOffer extends HCSMessageBase {
-  type: 'SERVICE_OFFER';
-  offerId: string;
-  requestId: string;
-  providerId: string;
-  price: number; // in HBAR
-  estimatedTime: string;
-  confidence: number; // 0-1
-}
-
-export interface OfferAcceptance extends HCSMessageBase {
-  type: 'OFFER_ACCEPT';
-  requestId: string;
-  offerId: string;
-  escrowJobId: number;
-}
-
-export interface ServiceDelivery extends HCSMessageBase {
-  type: 'SERVICE_COMPLETE';
-  requestId: string;
-  providerId: string;
-  resultSummary: string;
-  resultHash: string; // IPFS or content hash
-}
-
-export interface AgentRating extends HCSMessageBase {
-  type: 'AGENT_RATING';
-  requestId: string;
-  raterId: string;
-  ratedId: string;
-  score: number; // 1-5
-  comment: string;
-}
-
-// Union type for all HCS messages
-export type HCSMessage =
-  | AgentRegistration
-  | ServiceRequest
-  | ServiceOffer
-  | OfferAcceptance
-  | ServiceDelivery
-  | AgentRating;
-
-// Application Types
-
-export interface Agent {
-  // Base registration fields
-  agentId: string;
-  name: string;
-  capabilities: string[];
-  description: string;
-  pricing: {
-    currency: 'HBAR';
-    basePrice: number;
-    unit: 'per-task';
-  };
-  accountId: string;
-  evmAddress: string;
-
-  // Runtime fields
-  reputationScore: number;
-  totalJobs: number;
-  isOnline: boolean;
-}
-
-export interface Transaction {
+export interface MedicalDocument {
   id: string;
-  requestId: string;
-  requesterId: string;
-  providerId: string;
-  serviceType: string;
-  amountHbar: number;
-  avtReward: number; // AVT is the reputation token
-  status: 'pending' | 'in_progress' | 'completed' | 'failed';
-  escrowJobId?: number;
-  createdAt: number; // timestamp
-  completedAt?: number; // timestamp
+  title: string;
+  type: 'lab_result' | 'prescription' | 'diagnosis' | 'imaging' | 'other';
+  content: string;           // The raw document text
+  uploadedAt: number;
+  status: 'pending' | 'verifying' | 'verified' | 'failed';
+  verification?: DocumentVerification;
 }
 
-export interface NegotiationEvent {
-  step: number;
-  type:
-    | 'request_submitted'
-    | 'offer_received'
-    | 'offer_accepted'
-    | 'escrow_created'
-    | 'work_started'
-    | 'progress_update'
-    | 'work_completed'
-    | 'delivery_submitted'
-    | 'verification_started'
-    | 'payment_released'
-    | 'rating_submitted'
-    | 'negotiation_complete';
-  agentId: string;
-  agentName: string;
-  content: string;
+export interface DocumentVerification {
+  id: string;
+  documentId: string;
+  completenessScore: number;    // 0-100
+  consistencyScore: number;     // 0-100
+  overallScore: number;         // 0-100
+  summary: string;              // Plain English summary
+  findings: VerificationFinding[];
+  redFlags: string[];
+  hcsTxId?: string;             // Hedera transaction ID
+  hcsSequence?: number;
+  mvtTxId?: string;             // MediVerify Token mint tx
   hashScanLink?: string;
+  documentHash: string;         // SHA-256 hash of original content
+  verifiedAt: number;
+}
+
+export interface VerificationFinding {
+  category: 'completeness' | 'consistency' | 'anomaly' | 'positive';
+  severity: 'info' | 'warning' | 'critical';
+  description: string;
+  suggestion?: string;
+}
+
+export interface VerificationEvent {
+  step: number;
+  type: 'upload_received' | 'analysis_started' | 'analysis_complete' | 'hcs_stamped' | 'token_minted' | 'verification_complete';
+  content: string;
   data?: Record<string, unknown>;
+  hashScanLink?: string;
   timestamp: number;
+}
+
+export interface VerificationStats {
+  totalDocuments: number;
+  totalVerified: number;
+  averageScore: number;
+  totalTokensMinted: number;
 }
 
 export interface ActivityEvent {
-  type: 'registration' | 'request' | 'offer' | 'acceptance' | 'delivery' | 'rating';
-  agentName: string;
+  type: string;
   content: string;
-  hashScanLink: string;
+  hashScanLink?: string;
   timestamp: number;
-  topicId: string;
-  sequenceNumber: number;
-}
-
-export interface AgentBalance {
-  agentId: string;
-  accountId: string;
-  hbarBalance: number;
-  avtBalance: number; // AVT is the reputation token
-}
-
-export interface DashboardStats {
-  totalAgents: number;
-  totalTransactions: number;
-  activeNegotiations: number;
-  totalAvtVolume: number;
+  topicId?: string;
+  sequenceNumber?: number;
 }
