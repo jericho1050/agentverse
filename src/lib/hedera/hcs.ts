@@ -70,7 +70,7 @@ export async function getTopicMessages(
       params.set('sequencenumber', `gt:${afterSequence}`);
     }
 
-    const url = `${config.mirrorNode.url}/api/v1/topics/${topicId}/messages?${params.toString()}`;
+    const url = `${config.mirrorNode.url}/topics/${topicId}/messages?${params.toString()}`;
     const response = await fetch(url);
 
     if (!response.ok) {

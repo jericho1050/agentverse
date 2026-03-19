@@ -74,7 +74,7 @@ export async function getTokenBalance(
   tokenId: string
 ): Promise<number> {
   try {
-    const url = `${config.mirrorNode.url}/api/v1/accounts/${accountId}/tokens?token.id=${tokenId}`;
+    const url = `${config.mirrorNode.url}/accounts/${accountId}/tokens?token.id=${tokenId}`;
     const response = await fetch(url);
 
     if (!response.ok) {

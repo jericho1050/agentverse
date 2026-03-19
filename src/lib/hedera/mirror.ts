@@ -68,7 +68,7 @@ export interface GetTopicMessagesParams {
  * Base fetch function for Mirror Node API
  */
 export async function fetchMirrorNode<T = Record<string, unknown>>(path: string): Promise<T> {
-  const url = `${config.mirrorNode.url}/api/v1${path}`;
+  const url = `${config.mirrorNode.url}${path}`;
 
   try {
     const response = await fetch(url);
