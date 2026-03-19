@@ -85,20 +85,77 @@ export function NegotiationViewer({ events, isRunning }: NegotiationViewerProps)
                       <p className="text-sm text-gray-300 mt-1">{event.content}</p>
 
                       {isWork && event.data && (
-                        <pre className="mt-2 p-3 bg-white/[0.02] border-white/[0.06] rounded-xl font-mono text-xs text-gray-400 overflow-auto max-h-60 border">
-                          {JSON.stringify(event.data, null, 2)}
-                        </pre>
+                        <div className="mt-2 p-3 bg-gray-800 rounded-lg border border-gray-700 text-sm space-y-2">
+                          {event.data.summary ? (
+                            <div>
+                              <span className="font-medium text-gray-200">Summary: </span>
+                              <span className="text-gray-300">{String(event.data.summary)}</span>
+                            </div>
+                          ) : null}
+                          {event.data.overallScore ? (
+                            <div>
+                              <span className="font-medium text-gray-200">Score: </span>
+                              <span className="text-yellow-400">{String(event.data.overallScore)}/10</span>
+                            </div>
+                          ) : null}
+                          {Array.isArray(event.data.issues) && (event.data.issues as Array<Record<string, unknown>>).length > 0 ? (
+                            <div>
+                              <span className="font-medium text-gray-200">Issues found:</span>
+                              <ul className="mt-1 space-y-1 ml-4">
+                                {(event.data.issues as Array<Record<string, unknown>>).slice(0, 5).map((issue, idx) => (
+                                  <li key={idx} className="text-gray-400 text-xs">
+                                    <span className={issue.severity === 'critical' ? 'text-red-400' : issue.severity === 'warning' ? 'text-yellow-400' : 'text-blue-400'}>
+                                      [{String(issue.severity)}]
+                                    </span>{' '}
+                                    {String(issue.description)}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ) : null}
+                          {event.data.content && typeof event.data.content === 'string' ? (
+                            <div className="text-gray-300 whitespace-pre-wrap">{String(event.data.content).slice(0, 1000)}</div>
+                          ) : null}
+                          {event.data.raw && typeof event.data.raw === 'string' ? (
+                            <div className="text-gray-300 whitespace-pre-wrap">{String(event.data.raw).slice(0, 1000)}</div>
+                          ) : null}
+                          {event.data.keyFindings && Array.isArray(event.data.keyFindings) ? (
+                            <div>
+                              <span className="font-medium text-gray-200">Key Findings:</span>
+                              <ul className="mt-1 space-y-1 ml-4">
+                                {(event.data.keyFindings as string[]).slice(0, 5).map((finding, idx) => (
+                                  <li key={idx} className="text-gray-400 text-xs">{finding}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          ) : null}
+                        </div>
                       )}
 
                       {event.hashScanLink && (
-                        <a
-                          href={event.hashScanLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-emerald-400 hover:text-emerald-300 mt-1 inline-block"
-                        >
-                          Verify on HashScan →
-                        </a>
+                        <div className="mt-1">
+                          <a
+                            href={event.hashScanLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-emerald-400 hover:text-emerald-300 inline-block"
+                          >
+                            Verify on HashScan →
+                          </a>
+                          {/* Show real transaction ID */}
+                          {event.data?.hcsTxId ? (
+                            <span className="text-[10px] text-gray-600 font-mono ml-2">Tx: {String(event.data.hcsTxId).slice(0, 30)}...</span>
+                          ) : null}
+                          {event.data?.escrowTxHash ? (
+                            <span className="text-[10px] text-gray-600 font-mono ml-2">Tx: {String(event.data.escrowTxHash).slice(0, 30)}...</span>
+                          ) : null}
+                          {event.data?.avtTxId ? (
+                            <span className="text-[10px] text-gray-600 font-mono ml-2">Tx: {String(event.data.avtTxId).slice(0, 30)}...</span>
+                          ) : null}
+                          {event.data?.paymentTxHash ? (
+                            <span className="text-[10px] text-gray-600 font-mono ml-2">Tx: {String(event.data.paymentTxHash).slice(0, 30)}...</span>
+                          ) : null}
+                        </div>
                       )}
 
                       {isComplete && event.data && (
