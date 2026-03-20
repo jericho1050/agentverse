@@ -15,6 +15,7 @@ import {
   AlertCircle,
   ExternalLink,
   Copy,
+  Upload,
   Check,
   Hash,
   Sparkles
@@ -210,11 +211,31 @@ export default function VerifyPage() {
               </Button>
             </div>
 
+            {/* File Upload */}
+            <div className="flex items-center gap-3">
+              <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-dashed border-white/[0.12] bg-white/[0.02] hover:bg-white/[0.05] hover:border-emerald-500/30 cursor-pointer transition-all">
+                <Upload className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-400">Upload .txt, .pdf, or .csv file</span>
+                <input
+                  type="file"
+                  accept=".txt,.pdf,.csv,.doc,.docx"
+                  className="hidden"
+                  disabled={isVerifying}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const text = await file.text();
+                    setDocumentText(text);
+                  }}
+                />
+              </label>
+            </div>
+
             {/* Textarea */}
             <Textarea
               value={documentText}
               onChange={(e) => setDocumentText(e.target.value)}
-              placeholder="Paste medical document text here..."
+              placeholder="Paste medical document text here, or upload a file above..."
               className="min-h-[400px] bg-gray-800/50 border-white/[0.08] text-gray-200 font-[family-name:var(--font-jetbrains)] text-sm resize-none focus:border-emerald-500/30"
               disabled={isVerifying}
             />

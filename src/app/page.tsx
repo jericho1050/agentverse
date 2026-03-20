@@ -11,7 +11,7 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 export default function DashboardPage() {
   const { data: stats, isLoading: statsLoading } = useSWR<VerificationStats>('/api/stats', fetcher);
-  const { data: activities, isLoading: activitiesLoading } = useSWR<ActivityEvent[]>('/api/activity', fetcher);
+  const { data: activities, isLoading: activitiesLoading } = useSWR<ActivityEvent[]>('/api/recent-activity', fetcher);
 
   const recentActivities = activities?.slice(0, 5) || [];
 

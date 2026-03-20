@@ -25,7 +25,8 @@ import type { MedicalDocument } from '@/types';
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 export default function RecordsPage() {
-  const { data: documents, isLoading } = useSWR<MedicalDocument[]>('/api/documents', fetcher);
+  const { data, isLoading } = useSWR<{ documents: MedicalDocument[]; total: number }>('/api/documents', fetcher);
+  const documents = data?.documents;
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
