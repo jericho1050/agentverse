@@ -1,8 +1,37 @@
+# Dependencies
 node_modules/
+
+# Environment
 .env.local
+
+# Next.js
 .next/
+out/
+
+# Data
 data/
+
+# Planning (internal)
 .omc/
+
+# Hardhat
 artifacts/
 cache/
 typechain-types/
+
+# Deployment
+deployment-info.json
+
+# Screenshots (dev only)
+*.png
+
+# Playwright
+.playwright-mcp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
