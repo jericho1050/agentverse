@@ -72,4 +72,6 @@ class Store {
   }
 }
 
-export const store = new Store();
+// Use globalThis to persist store across Next.js API route module boundaries
+const globalForStore = globalThis as unknown as { __mediverify_store?: Store };
+export const store = globalForStore.__mediverify_store ?? (globalForStore.__mediverify_store = new Store());
