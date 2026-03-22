@@ -224,8 +224,22 @@ export default function VerifyPage() {
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    const text = await file.text();
-                    setDocumentText(text);
+                    // Use server-side parsing for PDF support
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    try {
+                      const res = await fetch('/api/parse-file', { method: 'POST', body: formData });
+                      const data = await res.json();
+                      if (data.text) {
+                        setDocumentText(data.text);
+                      } else {
+                        alert(data.error || 'Could not read file. Please paste text manually.');
+                      }
+                    } catch {
+                      // Fallback to direct text read for .txt files
+                      const text = await file.text();
+                      setDocumentText(text);
+                    }
                   }}
                 />
               </label>
