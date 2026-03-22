@@ -15,7 +15,7 @@ export async function callClaude(system: string, prompt: string): Promise<string
       {
         input,
         encoding: 'utf-8',
-        timeout: 60000,
+        timeout: 120000, // 2 min for Opus 4.6
         env: { ...process.env },
         maxBuffer: 1024 * 1024,
       }

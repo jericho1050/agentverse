@@ -8,7 +8,7 @@
  */
 import AnthropicBedrock from '@anthropic-ai/bedrock-sdk';
 
-const MODEL = 'us.anthropic.claude-sonnet-4-5-20250929-v1:0';
+const MODEL = 'us.anthropic.claude-opus-4-6-v1';
 
 async function main() {
   // Read JSON from stdin
