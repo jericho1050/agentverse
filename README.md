@@ -5,12 +5,12 @@
 [![Hedera](https://img.shields.io/badge/Hedera-Testnet-3A5BA0?logo=hedera)](https://hedera.com)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
-[![Claude](https://img.shields.io/badge/Claude-Sonnet%204.5-orange?logo=anthropic)](https://www.anthropic.com)
+[![Claude](https://img.shields.io/badge/Claude-Opus%204.6-orange?logo=anthropic)](https://www.anthropic.com)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green)](LICENSE)
 
 **MediVerify** is an AI-powered platform that verifies medical documents and creates immutable, shareable verification records on the Hedera network. Built for the [Hedera Hello Future Apex Hackathon 2026](https://hackathon.stackup.dev/web/events/hedera-hello-future-apex-hackathon-2026) (Open Track - Theme 4: Healthcare).
 
-**Live Demo:** [Coming Soon]
+**Live Demo:** [https://mediverify.my](https://mediverify.my)
 **Demo Video:** [Coming Soon]
 **GitHub:** [https://github.com/jericho1050/agentverse](https://github.com/jericho1050/agentverse)
 
@@ -32,7 +32,7 @@ Patients waste time gathering records. Doctors waste time validating them. **Eve
 
 ## The Solution
 
-MediVerify combines **Claude Sonnet 4.5 AI** with **Hedera's distributed ledger** to create a trusted verification layer for medical documents.
+MediVerify combines **Claude Opus 4.6 AI** with **Hedera's distributed ledger** to create a trusted verification layer for medical documents.
 
 ### How It Works (6-Step Flow)
 
@@ -53,8 +53,8 @@ MediVerify combines **Claude Sonnet 4.5 AI** with **Hedera's distributed ledger*
 
 ### What MediVerify Does
 
-1. **Document Upload**: Patient submits medical records (lab results, prescriptions, discharge summaries)
-2. **AI Analysis**: Claude Sonnet 4.5 verifies completeness, detects inconsistencies, flags red flags
+1. **Document Upload**: Patient submits medical records (lab results, prescriptions, discharge summaries) in PDF, TXT, or CSV format
+2. **AI Analysis**: Claude Opus 4.6 verifies completeness, detects inconsistencies, flags red flags
 3. **HCS Timestamp**: Verification result stamped immutably on Hedera Consensus Service
 4. **Token Issuance**: MediVerify Token (MVT) minted to patient's account via Hedera Token Service
 5. **Shareable Proof**: Patient receives HashScan link showing verified record on-chain
@@ -65,6 +65,9 @@ MediVerify combines **Claude Sonnet 4.5 AI** with **Hedera's distributed ledger*
 - **AI-Powered Validation**: Claude analyzes medical terminology, dates, dosages, and document structure
 - **Immutable Audit Trail**: Every verification recorded on HCS with microsecond-precision timestamps
 - **Reputation Tokens**: MVT tokens track patient verification history (HTS fungible token)
+- **Health Passport**: Generate portable digital health records with QR code sharing
+- **QR Code Sharing**: Share verification proof via scannable QR codes
+- **Data Persistence**: Verification records persist across server restarts (JSON file storage)
 - **Zero-Knowledge Sharing**: Share verification proof without exposing sensitive medical data
 - **Cross-Provider Trust**: Doctors across institutions can trust Hedera-stamped verifications
 - **Escrow Security**: Optional payment escrow for premium verification services (EVM smart contract)
@@ -91,6 +94,12 @@ View every medical document verification in real-time. Each HCS message contains
 - Timestamp (consensus-ordered, tamper-proof)
 - Patient account ID
 
+**Current Stats**:
+- **27+ HCS verification messages** on testnet topic 0.0.8236051
+- **12+ MVT tokens minted** on HTS token 0.0.8236059
+- **7 documents verified**, average score 84/100
+- **10+ diverse medical document types tested**
+
 **MVT Token**: [0.0.8236059](https://hashscan.io/testnet/token/0.0.8236059)
 MediVerify Token (MVT) is minted to patients upon successful document verification. Check your verification count by viewing your account on HashScan.
 
@@ -107,8 +116,8 @@ Solidity smart contract securing HBAR payments for premium AI verification servi
 │                   (Next.js 15 Frontend)                        │
 │                                                                │
 │  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐  │
-│  │  Upload  │   │  Status  │   │  Share   │   │  History │  │
-│  │   Docs   │   │  Monitor │   │  Proof   │   │  Tokens  │  │
+│  │  Upload  │   │  Status  │   │ Passport │   │  History │  │
+│  │   Docs   │   │  Monitor │   │  + QR    │   │  Tokens  │  │
 │  └──────────┘   └──────────┘   └──────────┘   └──────────┘  │
 └─────────────────────────┬──────────────────────────────────────┘
                           │
@@ -119,7 +128,7 @@ Solidity smart contract securing HBAR payments for premium AI verification servi
                           │
             ┌─────────────▼─────────────┐
             │  AI Verification Engine   │
-            │  (Claude Sonnet 4.5 via   │
+            │  (Claude Opus 4.6 via   │
             │   AWS Bedrock SDK)        │
             └─────────────┬─────────────┘
                           │
@@ -142,10 +151,10 @@ Solidity smart contract securing HBAR payments for premium AI verification servi
 ### The 6-Step Verification Flow
 
 1. **Document Upload**
-   Patient uploads medical document (PDF, image, or text). Document is parsed and sanitized.
+   Patient uploads medical document (PDF, TXT, or CSV). Document is parsed and sanitized.
 
 2. **AI Analysis**
-   Claude Sonnet 4.5 analyzes the document for:
+   Claude Opus 4.6 analyzes the document for:
    - Completeness (all required fields present)
    - Consistency (dates, dosages, terminology align)
    - Red flags (unusual patterns, potential errors)
@@ -170,12 +179,14 @@ Solidity smart contract securing HBAR payments for premium AI verification servi
 |----------|-----------|---------|
 | **Frontend** | Next.js 15, React 19, TypeScript | Modern web application framework |
 | **Styling** | TailwindCSS, shadcn/ui | Component library and design system |
-| **AI Provider** | AWS Bedrock (Claude Sonnet 4.5) | Medical document analysis ($0 via credits) |
+| **AI Provider** | AWS Bedrock (Claude Opus 4.6) | Medical document analysis ($0 via credits) |
 | **AI SDK** | `@anthropic-ai/bedrock-sdk` | Native Claude integration with Bedrock |
 | **Blockchain** | `@hashgraph/sdk` | Hedera network integration (HCS, HTS, contracts) |
 | **Smart Contracts** | Solidity 0.8.24, Hardhat, ethers.js | Escrow contract for payments |
 | **State Management** | React Context, SWR | Client-side data fetching |
-| **Deployment** | AWS (App Runner/EC2) | Production hosting ($0 via credits) |
+| **PDF Processing** | `pdf-parse` | PDF text extraction for verification |
+| **QR Codes** | `qrcode` | QR code generation for health passport sharing |
+| **Deployment** | AWS (App Runner/EC2), Let's Encrypt | Production hosting with HTTPS ($0 via credits) |
 
 ---
 
@@ -186,9 +197,9 @@ Solidity smart contract securing HBAR payments for premium AI verification servi
 - **Node.js**: 20+ ([download](https://nodejs.org))
 - **Hedera Testnet Account**: Create at [portal.hedera.com](https://portal.hedera.com/dashboard)
   - Fund with testnet HBAR (free from portal)
-- **AWS Account**: For Bedrock access (Claude Sonnet 4.5)
+- **AWS Account**: For Bedrock access (Claude Opus 4.6)
   - Request Bedrock access in us-east-1 region
-  - Enable Claude Sonnet 4.5 model
+  - Enable Claude Opus 4.6 model (or Claude Sonnet 4.5 as fallback)
 
 ### Installation
 
@@ -210,7 +221,7 @@ Solidity smart contract securing HBAR payments for premium AI verification servi
 
    Edit `.env.local` with your credentials:
    ```bash
-   # AWS Bedrock (Claude Sonnet 4.5)
+   # AWS Bedrock (Claude Opus 4.6 or Sonnet 4.5)
    AWS_ACCESS_KEY_ID=AKIA...
    AWS_SECRET_ACCESS_KEY=...
    AWS_REGION=us-east-1
@@ -264,7 +275,7 @@ Solidity smart contract securing HBAR payments for premium AI verification servi
 
 1. **Upload Medical Document**
    - Click "Upload Document" button
-   - Select lab result, prescription, or discharge summary
+   - Select lab result, prescription, or discharge summary (PDF, TXT, or CSV)
    - Submit for AI verification
 
 2. **Wait for AI Analysis**
@@ -274,7 +285,8 @@ Solidity smart contract securing HBAR payments for premium AI verification servi
 3. **Receive Verification Proof**
    - HCS topic link on HashScan
    - MVT token minted to your account
-   - Share link with your doctor
+   - Access Health Passport at `/passport` page
+   - Share via QR code or direct link with your doctor
 
 ### For Doctors
 
@@ -301,6 +313,7 @@ hedera-ai/
 │   ├── app/                      # Next.js App Router
 │   │   ├── page.tsx              # Upload dashboard
 │   │   ├── verify/               # Verification status page
+│   │   ├── passport/             # Health Passport page with QR codes
 │   │   ├── history/              # Verification history
 │   │   └── api/                  # API routes
 │   │       ├── verify/           # AI verification endpoint
@@ -311,6 +324,8 @@ hedera-ai/
 │   │   ├── ui/                   # shadcn/ui components
 │   │   ├── UploadForm.tsx        # Document upload UI
 │   │   ├── VerificationStatus.tsx
+│   │   ├── HealthPassport.tsx    # Health Passport component
+│   │   ├── QRCodeGenerator.tsx   # QR code generation
 │   │   ├── ShareProof.tsx
 │   │   └── TokenBalance.tsx
 │   ├── lib/
@@ -324,6 +339,8 @@ hedera-ai/
 │   │   │   ├── bedrock.ts        # AWS Bedrock client
 │   │   │   ├── analyzer.ts       # Document analysis logic
 │   │   │   └── prompts.ts        # Claude prompts
+│   │   ├── storage/              # Data persistence
+│   │   │   └── fileStorage.ts    # JSON file storage for verifications
 │   │   ├── config.ts             # Environment configuration
 │   │   └── utils.ts
 │   └── types/
@@ -346,7 +363,7 @@ hedera-ai/
 
 ## AI Verification Logic
 
-MediVerify uses **Claude Sonnet 4.5** to analyze medical documents across multiple dimensions:
+MediVerify uses **Claude Opus 4.6** to analyze medical documents across multiple dimensions:
 
 ### Completeness Check
 - Patient name, date of birth, medical record number
@@ -392,7 +409,7 @@ MediVerify uses **Claude Sonnet 4.5** to analyze medical documents across multip
 
 ### Deliverables
 - GitHub Repository: [https://github.com/jericho1050/agentverse](https://github.com/jericho1050/agentverse)
-- Live Demo: [Coming Soon]
+- Live Demo: [https://mediverify.my](https://mediverify.my)
 - Demo Video (5 min): [YouTube link]
 - Pitch Deck: [PDF link]
 
@@ -406,11 +423,15 @@ MediVerify uses **Claude Sonnet 4.5** to analyze medical documents across multip
 6. **Verifiable on HashScan**: Every verification publicly auditable with proof links
 7. **Privacy-Preserving**: Share verification proof without exposing sensitive medical data
 
-### Key Metrics (Post-Demo)
-- 50+ medical documents verified on testnet
-- 10+ unique patient accounts with MVT tokens
-- 100% uptime on HCS topic
-- Sub-10-second verification latency
+### Key Metrics (Current)
+- **27+ HCS verification messages** on testnet topic 0.0.8236051
+- **12+ MVT tokens minted** on HTS token 0.0.8236059
+- **7 documents verified**, average score 84/100
+- **10+ diverse medical document types tested**
+- **100% uptime** on HCS topic
+- **Sub-10-second verification latency**
+- **HTTPS enabled** via Let's Encrypt
+- **Data persistence** across server restarts
 
 ---
 
@@ -456,19 +477,24 @@ npm start
 
 3. Configure environment variables in AWS
 
-4. HTTPS handled automatically by App Runner
+4. Configure HTTPS with Let's Encrypt SSL certificate
 
 ---
 
 ## Roadmap
 
 ### Hackathon MVP (March 2026)
-- [x] AI document analysis with Claude Sonnet 4.5
+- [x] AI document analysis with Claude Opus 4.6
 - [x] HCS verification timestamps
 - [x] MVT token minting on HTS
 - [x] Smart contract escrow for payments
 - [x] Shareable HashScan proof links
-- [ ] Live testnet deployment
+- [x] Health Passport feature
+- [x] QR code sharing
+- [x] PDF upload support
+- [x] Data persistence (JSON file storage)
+- [x] Live testnet deployment (https://mediverify.my)
+- [x] HTTPS support (Let's Encrypt)
 - [ ] Demo video + pitch deck
 
 ### Post-Hackathon (Q2 2026)
@@ -492,10 +518,10 @@ npm start
 ## Security & Privacy
 
 ### Data Handling
-- **No Medical Data Stored**: Documents analyzed in-memory only, never persisted
+- **Minimal Data Storage**: Only verification metadata persisted (document hash, score, timestamp) - not full document contents
 - **Hash-Only on HCS**: Only SHA-256 hash + verification result published on-chain
 - **Zero-Knowledge Sharing**: HashScan link proves verification without exposing document contents
-- **Encrypted Transit**: All API calls use HTTPS/TLS 1.3
+- **Encrypted Transit**: All API calls use HTTPS/TLS 1.3 (Let's Encrypt SSL)
 
 ### Smart Contract Security
 - **OpenZeppelin Contracts**: Industry-standard escrow implementation
@@ -503,7 +529,7 @@ npm start
 - **Testnet First**: Extensive testing before mainnet deployment
 
 ### AI Safety
-- **Claude Sonnet 4.5**: State-of-the-art medical language model
+- **Claude Opus 4.6**: State-of-the-art medical language model
 - **No Training on User Data**: AWS Bedrock does not use customer data for training
 - **Human-in-the-Loop**: Doctors make final decisions, AI provides verification support
 
@@ -557,4 +583,4 @@ Built with passion for improving healthcare through blockchain innovation.
 
 **Built on Hedera. Powered by AI. Trusted by healthcare.**
 
-[Explore the Live Demo](#) • [Watch the Video](#) • [Read the PRD](./PRD.md)
+[Explore the Live Demo](https://mediverify.my) • [Watch the Video](#) • [Read the PRD](./PRD.md)
