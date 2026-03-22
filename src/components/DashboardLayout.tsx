@@ -1,13 +1,14 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ShieldCheck, FileText, Activity } from 'lucide-react';
+import { LayoutDashboard, ShieldCheck, FileText, Activity, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/verify', label: 'Verify', icon: ShieldCheck },
   { href: '/records', label: 'My Records', icon: FileText },
+  { href: '/passport', label: 'Passport', icon: Shield },
   { href: '/activity', label: 'Activity', icon: Activity },
 ];
 

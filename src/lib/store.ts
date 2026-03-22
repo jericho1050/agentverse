@@ -1,13 +1,54 @@
 import type { MedicalDocument, DocumentVerification, ActivityEvent, VerificationStats } from '@/types';
+import fs from 'fs';
 
 class Store {
   private documents: Map<string, MedicalDocument> = new Map();
   private verifications: Map<string, DocumentVerification> = new Map();
   private activityLog: ActivityEvent[] = [];
 
+  // Persistence methods
+  persist(): void {
+    try {
+      const data = {
+        documents: Array.from(this.documents.entries()),
+        verifications: Array.from(this.verifications.entries()),
+        activityLog: this.activityLog,
+      };
+      fs.writeFileSync('/tmp/mediverify-store.json', JSON.stringify(data));
+    } catch (e) {
+      console.error('Failed to persist store:', e);
+    }
+  }
+
+  loadFromDisk(): void {
+    try {
+      if (fs.existsSync('/tmp/mediverify-store.json')) {
+        const raw = fs.readFileSync('/tmp/mediverify-store.json', 'utf-8');
+        const data = JSON.parse(raw);
+        if (data.documents) {
+          for (const [key, val] of data.documents) {
+            this.documents.set(key, val as MedicalDocument);
+          }
+        }
+        if (data.verifications) {
+          for (const [key, val] of data.verifications) {
+            this.verifications.set(key, val as DocumentVerification);
+          }
+        }
+        if (data.activityLog) {
+          this.activityLog = data.activityLog;
+        }
+        console.log(`[Store] Loaded ${this.documents.size} documents from disk`);
+      }
+    } catch (e) {
+      console.error('Failed to load store from disk:', e);
+    }
+  }
+
   // Document methods
   addDocument(doc: MedicalDocument): void {
     this.documents.set(doc.id, doc);
+    this.persist();
   }
 
   getDocument(id: string): MedicalDocument | undefined {
@@ -33,6 +74,7 @@ class Store {
     if (doc) {
       this.documents.set(doc.id, { ...doc, status: 'verified', verification });
     }
+    this.persist();
   }
 
   getVerification(id: string): DocumentVerification | undefined {
@@ -74,4 +116,8 @@ class Store {
 
 // Use globalThis to persist store across Next.js API route module boundaries
 const globalForStore = globalThis as unknown as { __mediverify_store?: Store };
-export const store = globalForStore.__mediverify_store ?? (globalForStore.__mediverify_store = new Store());
+if (!globalForStore.__mediverify_store) {
+  globalForStore.__mediverify_store = new Store();
+  globalForStore.__mediverify_store.loadFromDisk();
+}
+export const store = globalForStore.__mediverify_store;

@@ -39,6 +39,7 @@ export default async function SharePage({ params }: SharePageProps) {
   };
 
   const scoreColors = getScoreColor(score);
+  const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://3.83.131.186'}/share/${id}`;
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 py-12 px-4">
@@ -60,6 +61,21 @@ export default async function SharePage({ params }: SharePageProps) {
             This document has been verified on the Hedera blockchain
           </p>
         </div>
+
+        {/* QR Code Card */}
+        <Card className="bg-gray-900/50 border-white/[0.08]">
+          <CardContent className="py-8">
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-sm text-gray-400 font-medium">Scan to Verify</p>
+              <img
+                src={`/api/qr?url=${encodeURIComponent(shareUrl)}`}
+                alt="QR Code"
+                className="w-48 h-48"
+              />
+              <p className="text-xs text-gray-500 text-center">Show this to your healthcare provider</p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Score Card */}
         <Card className="bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-emerald-500/5 border-emerald-500/20 relative overflow-hidden">
