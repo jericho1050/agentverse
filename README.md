@@ -11,7 +11,7 @@
 **MediVerify** is an AI-powered platform that verifies medical documents and creates immutable, shareable verification records on the Hedera network. Built for the [Hedera Hello Future Apex Hackathon 2026](https://hackathon.stackup.dev/web/events/hedera-hello-future-apex-hackathon-2026) (Open Track - Theme 4: Healthcare).
 
 **Live Demo:** [https://mediverify.my](https://mediverify.my)
-**Demo Video:** [Coming Soon]
+**Demo Video:** [https://www.youtube.com/watch?v=TPz5t4BIFE4](https://www.youtube.com/watch?v=TPz5t4BIFE4)
 **GitHub:** [https://github.com/jericho1050/agentverse](https://github.com/jericho1050/agentverse)
 
 ---
@@ -186,7 +186,7 @@ Solidity smart contract securing HBAR payments for premium AI verification servi
 | **State Management** | React Context, SWR | Client-side data fetching |
 | **PDF Processing** | `pdf-parse` | PDF text extraction for verification |
 | **QR Codes** | `qrcode` | QR code generation for health passport sharing |
-| **Deployment** | AWS (App Runner/EC2), Let's Encrypt | Production hosting with HTTPS ($0 via credits) |
+| **Deployment** | AWS EC2, IAM Instance Roles | Production hosting with Bedrock access ($0 via credits) |
 
 ---
 
@@ -310,51 +310,53 @@ Solidity smart contract securing HBAR payments for premium AI verification servi
 ```
 hedera-ai/
 ├── src/
-│   ├── app/                      # Next.js App Router
-│   │   ├── page.tsx              # Upload dashboard
-│   │   ├── verify/               # Verification status page
-│   │   ├── passport/             # Health Passport page with QR codes
-│   │   ├── history/              # Verification history
-│   │   └── api/                  # API routes
-│   │       ├── verify/           # AI verification endpoint
-│   │       ├── hcs/              # HCS timestamp endpoint
-│   │       ├── tokens/           # MVT token operations
-│   │       └── history/          # Query verification history
+│   ├── app/                        # Next.js 15 App Router
+│   │   ├── page.tsx                # Dashboard with stats + CTA
+│   │   ├── verify/page.tsx         # Main verification page (upload + SSE progress)
+│   │   ├── records/page.tsx        # Verified documents grid
+│   │   ├── passport/page.tsx       # Health Passport with circular score + QR
+│   │   ├── activity/page.tsx       # Real-time HCS message feed (EventSource)
+│   │   ├── share/[id]/page.tsx     # Public verification proof page
+│   │   └── api/
+│   │       ├── verify/route.ts     # POST: SSE stream for 6-step verification
+│   │       ├── documents/route.ts  # GET: verified documents list
+│   │       ├── stats/route.ts      # GET: verification statistics
+│   │       ├── share/[id]/route.ts # GET: verification proof by ID
+│   │       ├── activity/route.ts   # GET: SSE activity feed
+│   │       ├── recent-activity/route.ts # GET: JSON recent activity
+│   │       ├── qr/route.ts        # GET: QR code SVG generator
+│   │       └── parse-file/route.ts # POST: PDF/text file parsing
 │   ├── components/
-│   │   ├── ui/                   # shadcn/ui components
-│   │   ├── UploadForm.tsx        # Document upload UI
-│   │   ├── VerificationStatus.tsx
-│   │   ├── HealthPassport.tsx    # Health Passport component
-│   │   ├── QRCodeGenerator.tsx   # QR code generation
-│   │   ├── ShareProof.tsx
-│   │   └── TokenBalance.tsx
+│   │   ├── DashboardLayout.tsx     # Sidebar navigation, emerald theme
+│   │   └── ui/                     # shadcn/ui components
 │   ├── lib/
-│   │   ├── hedera/               # Hedera SDK utilities
-│   │   │   ├── client.ts         # Client setup
-│   │   │   ├── hcs.ts            # HCS operations
-│   │   │   ├── hts.ts            # HTS token operations
-│   │   │   ├── mirror.ts         # Mirror Node queries
-│   │   │   └── escrow.ts         # Smart contract interactions
-│   │   ├── ai/                   # AI verification engine
-│   │   │   ├── bedrock.ts        # AWS Bedrock client
-│   │   │   ├── analyzer.ts       # Document analysis logic
-│   │   │   └── prompts.ts        # Claude prompts
-│   │   ├── storage/              # Data persistence
-│   │   │   └── fileStorage.ts    # JSON file storage for verifications
-│   │   ├── config.ts             # Environment configuration
+│   │   ├── agents/
+│   │   │   ├── orchestrator.ts     # 6-step verification async generator
+│   │   │   ├── llm-client.ts      # Child process LLM caller (avoids webpack OOM)
+│   │   │   └── prompts.ts         # Medical document analysis prompts
+│   │   ├── hedera/
+│   │   │   ├── client.ts          # Hedera client factory
+│   │   │   ├── hcs.ts             # HCS publish + Mirror Node queries
+│   │   │   ├── hts.ts             # HTS token transfer + balance
+│   │   │   ├── escrow.ts          # EVM escrow contract via ethers.js
+│   │   │   └── mirror.ts          # Generic Mirror Node REST client
+│   │   ├── store.ts               # globalThis store + JSON file persistence
+│   │   ├── config.ts              # Typed env config with Zod validation
 │   │   └── utils.ts
-│   └── types/
-│       └── index.ts              # TypeScript definitions
+│   └── types/index.ts             # TypeScript definitions
 ├── contracts/
-│   ├── MediVerifyEscrow.sol      # Escrow smart contract
-│   └── test/                     # Contract tests
+│   └── AgentEscrow.sol            # Minimal escrow (create/complete/refund)
 ├── scripts/
-│   ├── deploy-escrow.ts          # Deploy contract
-│   ├── create-token.ts           # Create MVT token
-│   ├── setup-topic.ts            # Create HCS topic
-│   └── seed-data.ts              # Seed demo verifications
-├── package.json
+│   ├── llm-call.mjs              # Standalone Bedrock LLM (runs outside webpack)
+│   ├── setup-topics.ts           # Create HCS topics
+│   ├── create-token.ts           # Create MVT token on HTS
+│   ├── deploy-escrow.ts          # Deploy escrow contract
+│   ├── seed-agents.ts            # Register agents on HCS
+│   ├── setup-accounts.ts         # Setup Hedera accounts
+│   └── run-verifications.sh      # Run batch verification tests
 ├── hardhat.config.ts
+├── next.config.ts
+├── package.json
 ├── tsconfig.json
 └── README.md
 ```
@@ -410,8 +412,8 @@ MediVerify uses **Claude Opus 4.6** to analyze medical documents across multiple
 ### Deliverables
 - GitHub Repository: [https://github.com/jericho1050/agentverse](https://github.com/jericho1050/agentverse)
 - Live Demo: [https://mediverify.my](https://mediverify.my)
-- Demo Video (5 min): [YouTube link]
-- Pitch Deck: [PDF link]
+- Demo Video: [https://www.youtube.com/watch?v=TPz5t4BIFE4](https://www.youtube.com/watch?v=TPz5t4BIFE4)
+- Pitch Deck: included in repo (PDF)
 
 ### Why MediVerify Stands Out
 
@@ -430,8 +432,8 @@ MediVerify uses **Claude Opus 4.6** to analyze medical documents across multiple
 - **10+ diverse medical document types tested**
 - **100% uptime** on HCS topic
 - **Sub-10-second verification latency**
-- **HTTPS enabled** via Let's Encrypt
 - **Data persistence** across server restarts
+- **AWS EC2** with IAM instance role for permanent Bedrock access
 
 ---
 
@@ -457,27 +459,39 @@ npm run build
 npm start
 ```
 
-### Deployment
+### Deployment (AWS EC2)
 
-**AWS App Runner** (recommended):
+MediVerify is deployed on an **AWS EC2** instance with an IAM instance role for persistent Bedrock access (no expiring SSO tokens).
 
-1. Build Docker image with standalone output
-   ```javascript
-   // next.config.js
-   module.exports = {
-     output: 'standalone'
-   }
-   ```
+1. **Launch EC2 instance** (Ubuntu, t3.medium or similar)
 
-2. Deploy to AWS App Runner or EC2
+2. **Attach IAM instance role** with `AmazonBedrockFullAccess` policy
    ```bash
-   docker build -t mediverify .
-   docker push YOUR_ECR_REPO/mediverify:latest
+   # This gives the EC2 instance permanent Bedrock access — no AWS keys needed
+   aws iam create-role --role-name MediVerifyEC2Role ...
+   aws ec2 associate-iam-instance-profile ...
    ```
 
-3. Configure environment variables in AWS
+3. **Clone, install, and build on EC2**
+   ```bash
+   git clone https://github.com/jericho1050/agentverse.git
+   cd agentverse
+   npm install
+   npm run build
+   ```
 
-4. Configure HTTPS with Let's Encrypt SSL certificate
+4. **Set environment variables** in `.env.local` (Hedera keys, topic/token IDs)
+
+5. **Run with PM2** for process management
+   ```bash
+   npm install -g pm2
+   pm2 start npm --name mediverify -- start
+   pm2 save
+   ```
+
+6. **Point domain** (e.g., `mediverify.my`) to EC2 public IP
+
+**Key Architecture Decision**: The AI LLM call runs as a **child process** (`scripts/llm-call.mjs`) outside of webpack to avoid AWS SDK + Next.js RegExp OOM crashes. The EC2 IAM role eliminates credential rotation issues.
 
 ---
 
@@ -495,7 +509,8 @@ npm start
 - [x] Data persistence (JSON file storage)
 - [x] Live testnet deployment (https://mediverify.my)
 - [x] HTTPS support (Let's Encrypt)
-- [ ] Demo video + pitch deck
+- [x] Demo video ([YouTube](https://www.youtube.com/watch?v=TPz5t4BIFE4)) + pitch deck (PDF)
+- [x] AWS EC2 deployment with IAM instance role for Bedrock
 
 ### Post-Hackathon (Q2 2026)
 - [ ] OCR for scanned documents (extract text from images)
@@ -521,7 +536,7 @@ npm start
 - **Minimal Data Storage**: Only verification metadata persisted (document hash, score, timestamp) - not full document contents
 - **Hash-Only on HCS**: Only SHA-256 hash + verification result published on-chain
 - **Zero-Knowledge Sharing**: HashScan link proves verification without exposing document contents
-- **Encrypted Transit**: All API calls use HTTPS/TLS 1.3 (Let's Encrypt SSL)
+- **Encrypted Transit**: Production deployment on AWS EC2
 
 ### Smart Contract Security
 - **OpenZeppelin Contracts**: Industry-standard escrow implementation
@@ -564,9 +579,8 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 Built with passion for improving healthcare through blockchain innovation.
 
-**Developer**: [Your Name]
-**Contact**: [Your Email]
-**Twitter**: [Your Twitter]
+**Developer**: Jericho Wenzel
+**GitHub**: [@jericho1050](https://github.com/jericho1050)
 
 ---
 
@@ -583,4 +597,4 @@ Built with passion for improving healthcare through blockchain innovation.
 
 **Built on Hedera. Powered by AI. Trusted by healthcare.**
 
-[Explore the Live Demo](https://mediverify.my) • [Watch the Video](#) • [Read the PRD](./PRD.md)
+[Explore the Live Demo](https://mediverify.my) • [Watch the Demo](https://www.youtube.com/watch?v=TPz5t4BIFE4) • [View on HashScan](https://hashscan.io/testnet/topic/0.0.8236051)
